@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>연남 클럽 찾아 헤매다 AWS에 500만원 뜯긴 썰? 아, 클라우드플레어 네가 왜 거기서 나와...</title>
+  <link rel="canonical" href="https://kyoto-plumbing.pages.dev/posts/review-002.html">
+  <style>
+    body { font-family: sans-serif; line-height: 1.8; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; }
+    h1 { font-family: serif; color: #111; margin-bottom: 0.5em; }
+    h2 { font-size: 1.4em; margin: 1.5em 0 0.5em; color: #222; }
+    h3 { font-size: 1.15em; margin: 1.2em 0 0.4em; color: #444; }
+    p { margin: 0 0 1em; }
+    a { color: #3182ce; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../index.html">← 목록으로 돌아가기</a>
+  </header>
+  <main>
+    <h1>연남 클럽 찾아 헤매다 AWS에 500만원 뜯긴 썰? 아, 클라우드플레어 네가 왜 거기서 나와...</h1>
+    <article>
+      <p>저 진짜 아무것도 모르고 시작했거든요? 그냥 연남 클럽 같은 데 갈 때, 아, 여기 괜찮나? 하는 정보들 모아서 보여주는 작은 블로그 하나 굴리고 싶었을 뿐인데, 세상에나 마상에나... AWS 프리티어 계정으로 시작했다가 한 달 만에 500만원 청구서를 받고 심장이 쿵 내려앉는 줄 알았지 뭐예요. 아니, 저만 이런 황당한 경험한 건가요? 🤯</p>
+<p>### 💸 AWS 빌 폭탄의 서막: Lightsail CPU 크레딧은 죄가 없다</p>
+<p>처음엔 제가 뭘 잘못 건드렸나 싶었어요. Lightsail 인스턴스로 워드프레스 깔고 CDN으로 Cloudflare 붙여서 썼으니, 솔직히 트래픽 조금 나와도 괜찮을 줄 알았거든요. 근데 갑자기 '연남 클럽 추천정보' 검색량이 빵! 터진 날이었나? 아무튼, 그때부터 뭔가 이상한 기운을 감지했어요. 서버가 자꾸 502 Bad Gateway를 뿜어내고, Lightsail 대시보드 보니까 CPU 크레딧이 바닥을 치는 거예요. 😱 아니, 캐싱 잘 된다고 해서 쓴 건데, 왜 자꾸 원본 서버를 때리는 거지?</p>
+<p>### ⏱️ Cloudflare Cache Reserve의 배신 아닌 배신</p>
+<p>문제는 나중에 알고 보니까 Cloudflare Cache Reserve 쪽에서 특정 엣지 로케이션, 예를 들면 아시아 태평양 지역의 싱가포르나 도쿄 같은 데서 캐시 무효화가 최대 47분까지 지연될 수 있다는... 그런 괴담 같은 얘기가 있더라고요? 저는 분명히 `Cache-Tag`로 잘 분류하고 `PURGE` 요청도 날렸는데, 얘네가 특정 조건에서 쿨하게 그걸 무시하고 오래된 캐시를 계속 서빙했던 거죠. 사용자는 신선한 '연남 클럽 추천정보'를 보고 싶은데, Cloudflare는 꿋꿋하게 옛날 데이터를 줬으니, 결국 새로고침을 미친 듯이 누르고, 그게 다 원본 서버로 향했던 거예요. 😡</p>
+<p>### 💔 감성 팔이 죄송해요, 근데 진짜 억울했어요</p>
+<p>그때 제 기분이 어땠냐면요, 마치 연남 클럽에서 한껏 신나게 놀고 있는데 갑자기 계산서에 제가 시키지도 않은 샴페인 5병이 찍혀 나온 느낌? 아니, 진짜 기분 너무 상하는 거 있죠? AWS 서포트랑 Cloudflare 서포트 왔다 갔다 하면서 씨름하는데, 다들 "음, 그건 고객님의 트래픽 패턴 문제일 수 있습니다..." 같은 소리만 하고. 결국 제가 `Cloudflare Cache-Tag invalidation` 로직을 더 빡세게 만들고 `Lightsail CPU Burst` 임계치를 주시하면서, 트래픽 폭증 시 Cloudflare Workers로 특정 요청을 아예 드롭시키는 임시방편까지 동원해서 겨우 수습했어요. 그 47분이라는 숫자가 제 통장에 500만원짜리 비수를 꽂을 줄이야... 흑흑.</p>
+<p>여러분은 혹시 이런 극악무도한 `edge location latency` 경험 없으세요? 저만 이런 걸로 골머리 앓았나... 진짜 클라우드 세상은 알면 알수록 무섭네요. 😥</p>
+
+    <div class="juice-ref-ep22hi" style="margin-top:2.5rem;padding:1rem 0;border-top:1px dashed #ccc;font-size:0.9rem;color:#666;">
+      <p style="font-weight:600;margin-bottom:0.5rem;">함께 보면 좋은 정보</p>
+      <ul style="list-style:none;padding:0;margin:0;">
+      <li>관련 업계 트렌드와 통계는 <a href="https://mens-esthe.space">shinjuku-mens</a>에 정리되어 있습니다.</li>
+      <li>자세한 기술 명세 가이드는 <a href="https://github.com/" rel="noopener noreferrer" target="_blank">공식 가이드 커뮤니티</a>를 참고하십시오.</li>
+      </ul>
+    </div>
+    </article>
+  </main>
+</body>
+</html>
